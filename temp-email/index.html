@@ -699,19 +699,96 @@
       return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     }
 
-    function extractBody(raw) {
+      function extractBody(raw) {
+          if (!raw) return '';
 
-      const lines = raw.split(/\r?\n/);
-      let inBody = false;
-      let body = [];
-      for (const line of lines) {
-        if (!inBody && line.trim() === '') { inBody = true; continue; }
-        if (inBody) body.push(line);
+          const normalised = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+          const topCtMatch = normalised.match(/^content-type:\s*([^\n;]+)/im);
+          const topCt = topCtMatch ? topCtMatch[1].trim().toLowerCase() : '';
+
+          if (topCt.startsWith('multipart/')) {
+              const boundaryMatch = normalised.match(/boundary="?([^"\n;]+)"?/i);
+              if (boundaryMatch) {
+                  const boundary = boundaryMatch[1].trim();
+                  const parts = splitMimeParts(normalised, boundary);
+
+                  const plainPart = parts.find(p => p.ct.startsWith('text/plain'));
+                  if (plainPart) return decodePart(plainPart);
+
+                  const htmlPart = parts.find(p => p.ct.startsWith('text/html'));
+                  if (htmlPart) return stripHtml(decodePart(htmlPart));
+              }
+          }
+
+          const headerEnd = normalised.indexOf('\n\n');
+          if (headerEnd === -1) return normalised.trim();
+
+          const headers = normalised.slice(0, headerEnd).toLowerCase();
+          const bodyRaw = normalised.slice(headerEnd + 2);
+
+          const encoding = (headers.match(/content-transfer-encoding:\s*(\S+)/) || [])[1] || '';
+          const ct = (headers.match(/content-type:\s*([^;\n]+)/) || [])[1] || '';
+
+          let decoded = decodeContent(bodyRaw.trim(), encoding);
+          if (ct.trim().startsWith('text/html')) decoded = stripHtml(decoded);
+
+          return decoded.trim() || normalised.trim();
       }
-      const joined = body.join('\n').trim();
 
-      return joined || raw;
-    }
+      function splitMimeParts(raw, boundary) {
+          const delimiter = '--' + boundary;
+          const parts = [];
+          const segments = raw.split(delimiter);
+
+          for (const seg of segments) {
+              if (seg.trim() === '' || seg.trim() === '--') continue;
+              const hdrEnd = seg.indexOf('\n\n');
+              if (hdrEnd === -1) continue;
+              const hdrBlock = seg.slice(0, hdrEnd).toLowerCase();
+              const body = seg.slice(hdrEnd + 2);
+
+              const ctMatch = hdrBlock.match(/content-type:\s*([^;\n]+)/);
+              const encMatch = hdrBlock.match(/content-transfer-encoding:\s*(\S+)/);
+
+              parts.push({
+                  ct: (ctMatch ? ctMatch[1] : 'text/plain').trim(),
+                  encoding: (encMatch ? encMatch[1] : '').trim(),
+                  body
+              });
+          }
+          return parts;
+      }
+
+      function decodePart(part) {
+          return decodeContent(part.body.trim(), part.encoding);
+      }
+
+      function decodeContent(body, encoding) {
+          const enc = (encoding || '').toLowerCase().trim();
+          if (enc === 'base64') {
+              try {
+                  return decodeURIComponent(escape(atob(body.replace(/\s+/g, ''))));
+              } catch (e) {
+                  return body;
+              }
+          }
+          if (enc === 'quoted-printable') {
+              return body
+                  .replace(/=\r?\n/g, '')
+                  .replace(/=([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+          }
+          return body;
+      }
+
+      function stripHtml(html) {
+          const tmp = document.createElement('div');
+          tmp.innerHTML = html;
+          tmp.querySelectorAll('br, p, div, tr').forEach(el => {
+              el.insertAdjacentText('beforebegin', '\n');
+          });
+          return (tmp.textContent || tmp.innerText || '').replace(/\n{3,}/g, '\n\n').trim();
+      }
 
     function showToast(msg, type='success') {
       const existing = document.querySelector('.toast');
