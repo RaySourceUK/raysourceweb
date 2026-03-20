@@ -1,515 +1,7 @@
-<!DOCTYPE html>
-<html lang="en-GB">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Temporary Email — RaySource</title>
-  <meta name="description" content="Generate a free, disposable email address instantly. No sign-up required. Emails expire after one hour." />
-  <link rel="icon" type="image/png" href="/assets/logo-ray-grey.png" />
-  <link rel="stylesheet" href="/assets/style.css" />
-  <style>
-    .te-wrap {
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 60px 24px 100px;
-    }
-
-    .te-header {
-      text-align: center;
-      margin-bottom: 56px;
-    }
-    .te-header .eyebrow {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 16px;
-      display: block;
-    }
-    .te-header h1 {
-      font-size: clamp(2rem, 5vw, 3rem);
-      margin-bottom: 12px;
-    }
-    .te-header p {
-      color: var(--text-muted);
-      font-size: 1rem;
-      max-width: 420px;
-      margin: 0 auto;
-      line-height: 1.65;
-    }
-
-    .inbox-panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-    }
-
- 
-    .address-bar {
-      padding: 24px 28px;
-      background: var(--surface-2);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .address-display {
-      flex: 1;
-      min-width: 0;
-    }
-    .address-label {
-      font-size: 0.72rem;
-      color: var(--text-dim);
-      font-family: 'JetBrains Mono', monospace;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-    .address-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: clamp(0.85rem, 2.5vw, 1.05rem);
-      color: var(--accent);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-    .address-value:hover { opacity: 0.75; }
-
-    .address-actions {
-      display: flex;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-
-    .inbox-toolbar {
-      padding: 14px 28px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .toolbar-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .expiry-badge {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .expiry-time {
-      color: var(--text);
-      font-weight: 500;
-    }
-    .expiry-time.warning { color: #e8a020; }
-    .expiry-time.critical { color: var(--red); }
-
-
-    .email-list {
-      min-height: 240px;
-    }
-    .email-item {
-      padding: 18px 28px;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: background 0.15s;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 6px 16px;
-      align-items: start;
-    }
-    .email-item:last-child { border-bottom: none; }
-    .email-item:hover { background: rgba(27, 232, 196, 0.04); }
-    .email-item.unread .email-from { color: var(--text); font-weight: 600; }
-    .email-from {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .email-subject {
-      font-size: 0.925rem;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .email-time {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem;
-      color: var(--text-dim);
-      text-align: right;
-      grid-row: span 2;
-      display: flex;
-      align-items: center;
-    }
-
-
-    .inbox-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 20px;
-      gap: 12px;
-      color: var(--text-muted);
-      text-align: center;
-    }
-    .inbox-state-icon {
-      font-size: 2.4rem;
-      margin-bottom: 4px;
-      opacity: 0.5;
-    }
-    .inbox-state h3 {
-      font-family: 'Instrument Sans', sans-serif;
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: var(--text-muted);
-    }
-    .inbox-state p {
-      font-size: 0.83rem;
-      color: var(--text-dim);
-      max-width: 280px;
-    }
-
- 
-    .spinner {
-      width: 22px; height: 22px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(7, 9, 15, 0.88);
-      backdrop-filter: blur(8px);
-      z-index: 200;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      animation: fadeIn 0.2s both;
-    }
-    .modal {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      width: 100%;
-      max-width: 680px;
-      max-height: 80vh;
-      display: flex;
-      flex-direction: column;
-      animation: fadeUp 0.3s cubic-bezier(0.22,1,0.36,1) both;
-    }
-    .modal-header {
-      padding: 24px 28px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-    }
-    .modal-header-info { flex: 1; min-width: 0; }
-    .modal-subject {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 6px;
-      word-break: break-word;
-    }
-    .modal-meta {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
-      word-break: break-all;
-    }
-    .modal-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px 28px;
-    }
-    .modal-body pre {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
-      color: #8faabf;
-      white-space: pre-wrap;
-      word-break: break-word;
-      line-height: 1.7;
-    }
-    .modal-body .body-text {
-      font-size: 0.9rem;
-      color: var(--text);
-      line-height: 1.75;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    .modal-footer {
-      padding: 16px 28px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-    }
-
- 
-    .report-box {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .report-box textarea {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--text);
-      font-family: 'Instrument Sans', sans-serif;
-      font-size: 0.9rem;
-      padding: 12px 14px;
-      resize: vertical;
-      min-height: 100px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .report-box textarea:focus {
-      border-color: rgba(27, 232, 196, 0.4);
-    }
-
- 
-    .toast {
-      position: fixed;
-      bottom: 28px;
-      left: 50%;
-      transform: translateX(-50%) translateY(8px);
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 10px 20px;
-      font-size: 0.85rem;
-      color: var(--text);
-      font-family: 'JetBrains Mono', monospace;
-      animation: toastIn 0.3s cubic-bezier(0.22,1,0.36,1) both;
-      z-index: 500;
-      white-space: nowrap;
-    }
-    @keyframes toastIn {
-      from { opacity: 0; transform: translateX(-50%) translateY(16px); }
-      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
-    .toast.success { border-color: rgba(27,232,196,0.4); color: var(--accent); }
-    .toast.error   { border-color: rgba(232,75,75,0.4); color: #e87070; }
-
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
-      margin-top: 28px;
-    }
-    .info-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px 22px;
-      font-size: 0.85rem;
-    }
-    .info-card-icon { font-size: 1.3rem; margin-bottom: 10px; }
-    .info-card h4 {
-      font-family: 'Syne', sans-serif;
-      font-size: 0.9rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-    .info-card p {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-
-    @media (max-width: 640px) {
-      .te-wrap { padding: 40px 16px 80px; }
-      .address-bar { padding: 18px 18px; }
-      .email-item { padding: 14px 18px; }
-      .inbox-toolbar { padding: 12px 18px; }
-      .modal { max-height: 90vh; }
-      .modal-header, .modal-body, .modal-footer { padding: 18px; }
-    }
-  </style>
-</head>
-<body class="page">
-
-  <!-- ── Nav ──────────────────────────────────────────────── -->
-  <nav>
-    <a href="/" class="nav-logo">
-      <img src="/assets/logo-text-white.png" alt="RaySource" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-      <img src="/assets/logo-text-grey.png" alt="RaySource" style="display:none">
-    </a>
-    <ul class="nav-links">
-      <li><a href="/">Home</a></li>
-      <li><a href="/temp-email" class="active">Temp Email <span class="nav-badge">Live</span></a></li>
-      <li><a href="/tos">Terms</a></li>
-      <li><a href="/privacy">Privacy</a></li>
-    </ul>
-  </nav>
-
-
-  <main class="te-wrap">
-    <div class="te-header anim-up">
-      <span class="eyebrow">Privacy Tool</span>
-      <h1>Temporary Email</h1>
-      <p>A disposable inbox, ready in an instant. No sign-up, no personal details. Emails vanish after one hour.</p>
-    </div>
-
-
-    <div class="inbox-panel anim-up-2" id="inbox-panel">
-
-
-      <div class="address-bar">
-        <div class="address-display">
-          <div class="address-label">Your temporary address</div>
-          <div class="address-value" id="email-address" onclick="copyAddress()" title="Click to copy">
-            Generating…
-          </div>
-        </div>
-        <div class="address-actions">
-          <button class="btn btn-ghost" onclick="copyAddress()" id="copy-btn" aria-label="Copy address">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            Copy
-          </button>
-          <button class="btn btn-outline" onclick="generateNewAddress()" aria-label="Generate new address">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-            New
-          </button>
-        </div>
-      </div>
-
-
-      <div class="inbox-toolbar">
-        <div class="toolbar-left">
-          <div class="expiry-badge">
-            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            Expires in <span class="expiry-time" id="expiry-display">--:--</span>
-          </div>
-        </div>
-        <button class="btn btn-ghost" onclick="checkInbox()" id="refresh-btn" style="padding:6px 14px; font-size:0.8rem;">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-          Refresh
-        </button>
-      </div>
-
-
-      <div class="email-list" id="email-list">
-        <div class="inbox-state">
-          <div class="inbox-state-icon">📭</div>
-          <h3>Inbox empty</h3>
-          <p>Send an email to your temporary address above — it'll appear here.</p>
-        </div>
-      </div>
-
-    </div>
-
-   
-    <div class="info-grid anim-up-3">
-      <div class="info-card">
-        <div class="info-card-icon">⏱️</div>
-        <h4>One-hour expiry</h4>
-        <p>All emails and inboxes are automatically deleted after 60 minutes.</p>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">🔒</div>
-        <h4>No sign-up</h4>
-        <p>We don't ask for your name, real email, or any personal information.</p>
-      </div>
-      <div class="info-card">
-        <div class="info-card-icon">⚠️</div>
-        <h4>Misuse is banned</h4>
-        <p>Abusive, illegal, or automated use results in an immediate IP ban. See our <a href="/tos">Terms of Service</a>.</p>
-      </div>
-    </div>
-  </main>
-
-
-  <footer>
-    <img src="/assets/logo-text-grey.png" alt="RaySource" style="height:20px; opacity:0.5;" onerror="this.style.display='none'">
-    <div class="footer-links">
-      <a href="/">Home</a>
-      <a href="/tos">Terms of Service</a>
-      <a href="/privacy">Privacy Policy</a>
-      <a href="mailto:support@raysource.co.uk">Support</a>
-    </div>
-    <span class="footer-copy">© 2025 RaySource UK</span>
-  </footer>
-
-
-  <div id="email-modal" class="modal-overlay" style="display:none;" onclick="closeModal(event)">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-subject">
-      <div class="modal-header">
-        <div class="modal-header-info">
-          <div class="modal-subject" id="modal-subject">—</div>
-          <div class="modal-meta" id="modal-meta">—</div>
-        </div>
-        <button class="btn btn-outline" onclick="closeModal()" style="padding:6px 12px; flex-shrink:0;" aria-label="Close">✕</button>
-      </div>
-      <div class="modal-body" id="modal-body">
-        <div class="body-text" id="modal-body-text"></div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" style="font-size:0.8rem; color:var(--red); border-color:rgba(232,75,75,0.3);" onclick="openReport()">
-          Report abuse
-        </button>
-        <button class="btn btn-outline" onclick="closeModal()">Close</button>
-      </div>
-    </div>
-  </div>
-
-
-  <div id="report-modal" class="modal-overlay" style="display:none;" onclick="closeReportModal(event)">
-    <div class="modal" style="max-width:480px;">
-      <div class="modal-header">
-        <div class="modal-header-info">
-          <div class="modal-subject">Report Abusive Email</div>
-          <div class="modal-meta">Help us keep the service clean.</div>
-        </div>
-        <button class="btn btn-outline" onclick="closeReportModal()" style="padding:6px 12px; flex-shrink:0;" aria-label="Close">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="report-box">
-          <p style="font-size:0.875rem; color:var(--text-muted); line-height:1.65;">
-            Please describe why this email should be reported. Our team will review it.
-          </p>
-          <textarea id="report-reason" placeholder="e.g. Phishing attempt, spam, illegal content…" aria-label="Report reason"></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeReportModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="submitReport()">Submit Report</button>
-      </div>
-    </div>
-  </div>
-
-
-  <script>
-    const API_BASE  = 'https://plain-disk-aa56.taloninteractive.workers.dev';
+<script>
+    const API_BASE = 'https://plain-disk-aa56.taloninteractive.workers.dev';
     const EMAIL_DOMAIN = 'temp.raysource.co.uk';
-    const TTL_MS    = 3600 * 1000; // 1 hour
+    const TTL_MS = 3600 * 1000;
 
     let currentAddress = '';
     let currentEmailId = null;
@@ -518,300 +10,283 @@
     let autoRefreshTimer = null;
     let emails = [];
 
-
-    const ADJS = ['swift','calm','bright','deep','dark','quiet','wide','keen','bold','soft','long','free','safe','cool','warm','thin','vast','wild'];
-    const NOUNS = ['ray','tide','wave','reef','cove','bay','mist','dusk','dawn','tern','kelp','isle','shoal','brine','gull'];
+    const ADJS = ['swift', 'calm', 'bright', 'deep', 'dark', 'quiet', 'wide', 'keen', 'bold', 'soft', 'long', 'free', 'safe', 'cool', 'warm', 'thin', 'vast', 'wild'];
+    const NOUNS = ['ray', 'tide', 'wave', 'reef', 'cove', 'bay', 'mist', 'dusk', 'dawn', 'tern', 'kelp', 'isle', 'shoal', 'brine', 'gull'];
 
     function randomAddress() {
-      const a = ADJS[Math.floor(Math.random() * ADJS.length)];
-      const n = NOUNS[Math.floor(Math.random() * NOUNS.length)];
-      const r = Math.floor(Math.random() * 9000) + 1000;
-      return `${a}-${n}-${r}@${EMAIL_DOMAIN}`;
+        const a = ADJS[Math.floor(Math.random() * ADJS.length)];
+        const n = NOUNS[Math.floor(Math.random() * NOUNS.length)];
+        const r = Math.floor(Math.random() * 9000) + 1000;
+        return `${a}-${n}-${r}@${EMAIL_DOMAIN}`;
     }
 
     function generateNewAddress() {
-      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
-      if (expiryTimer)      clearInterval(expiryTimer);
-
-      currentAddress = randomAddress();
-      expiryTs = Date.now() + TTL_MS;
-      emails = [];
-
-      document.getElementById('email-address').textContent = currentAddress;
-      renderEmpty('Inbox empty', 'Send an email to your temporary address above — it\'ll appear here.');
-      startExpiry();
-      startAutoRefresh();
+        if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+        if (expiryTimer) clearInterval(expiryTimer);
+        currentAddress = randomAddress();
+        expiryTs = Date.now() + TTL_MS;
+        emails = [];
+        document.getElementById('email-address').textContent = currentAddress;
+        renderEmpty('Inbox empty', "Send an email to your temporary address above and it'll appear here.");
+        startExpiry();
+        startAutoRefresh();
     }
-
 
     function startExpiry() {
-      if (expiryTimer) clearInterval(expiryTimer);
-      updateExpiry();
-      expiryTimer = setInterval(updateExpiry, 1000);
+        if (expiryTimer) clearInterval(expiryTimer);
+        updateExpiry();
+        expiryTimer = setInterval(updateExpiry, 1000);
     }
+
     function updateExpiry() {
-      const el = document.getElementById('expiry-display');
-      const remaining = Math.max(0, expiryTs - Date.now());
-      const mins = Math.floor(remaining / 60000);
-      const secs = Math.floor((remaining % 60000) / 1000);
-      el.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-      el.className = 'expiry-time' + (mins < 5 ? (mins < 1 ? ' critical' : ' warning') : '');
-      if (remaining === 0) {
-        clearInterval(expiryTimer);
-        clearInterval(autoRefreshTimer);
-        renderEmpty('Inbox expired', 'This address has expired. Generate a new one to continue.');
-      }
+        const el = document.getElementById('expiry-display');
+        const remaining = Math.max(0, expiryTs - Date.now());
+        const mins = Math.floor(remaining / 60000);
+        const secs = Math.floor((remaining % 60000) / 1000);
+        el.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        el.className = 'expiry-time' + (mins < 5 ? (mins < 1 ? ' critical' : ' warning') : '');
+        if (remaining === 0) {
+            clearInterval(expiryTimer);
+            clearInterval(autoRefreshTimer);
+            renderEmpty('Inbox expired', 'This address has expired. Generate a new one to continue.');
+        }
     }
 
- 
     function startAutoRefresh() {
-      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
-      autoRefreshTimer = setInterval(checkInbox, 15000);
+        if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+        autoRefreshTimer = setInterval(checkInbox, 15000);
     }
-
 
     async function checkInbox() {
-      if (!currentAddress) return;
-      const btn = document.getElementById('refresh-btn');
-      btn.disabled = true;
-
-      try {
-        const res = await fetch(`${API_BASE}?email=${encodeURIComponent(currentAddress)}`);
-        if (res.status === 404) {
-
-          renderEmpty('Inbox empty', 'Send an email to your temporary address above — it\'ll appear here.');
-          return;
+        if (!currentAddress) return;
+        const btn = document.getElementById('refresh-btn');
+        btn.disabled = true;
+        try {
+            const res = await fetch(`${API_BASE}?email=${encodeURIComponent(currentAddress)}`);
+            if (res.status === 404) {
+                renderEmpty('Inbox empty', "Send an email to your temporary address above and it'll appear here.");
+                return;
+            }
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                showToast(err.error || 'Something went wrong. Please try again.', 'error');
+                return;
+            }
+            const data = await res.json();
+            emails = [data];
+            renderEmails();
+        } catch (e) {
+            showToast('Could not connect to the server. Please try again.', 'error');
+        } finally {
+            btn.disabled = false;
         }
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          showToast(err.error || 'Something went wrong. Please try again.', 'error');
-          return;
-        }
-        const data = await res.json();
-
-        emails = [data];
-        renderEmails();
-      } catch (e) {
-        showToast('Could not connect to the server. Please try again.', 'error');
-      } finally {
-        btn.disabled = false;
-      }
     }
-
 
     function renderEmpty(title, subtitle) {
-      document.getElementById('email-list').innerHTML = `
-        <div class="inbox-state">
-          <div class="inbox-state-icon">📭</div>
-          <h3>${escHtml(title)}</h3>
-          <p>${escHtml(subtitle)}</p>
-        </div>`;
-    }
-
-    function renderLoading() {
-      document.getElementById('email-list').innerHTML = `
-        <div class="inbox-state">
-          <div class="spinner"></div>
-          <h3>Checking inbox…</h3>
-        </div>`;
+        document.getElementById('email-list').innerHTML = `
+      <div class="inbox-state">
+        <div class="inbox-state-icon">📭</div>
+        <h3>${escHtml(title)}</h3>
+        <p>${escHtml(subtitle)}</p>
+      </div>`;
     }
 
     function renderEmails() {
-      const list = document.getElementById('email-list');
-      if (!emails.length) { renderEmpty('Inbox empty', 'Send an email to your temporary address — it\'ll appear here.'); return; }
-      list.innerHTML = emails.map((e, i) => `
-        <div class="email-item unread" onclick="openEmail(${i})">
-          <div class="email-from">${escHtml(e.from || 'Unknown Sender')}</div>
-          <div class="email-time">${formatTime(e.timestamp)}</div>
-          <div class="email-subject">${escHtml(e.subject || '(No Subject)')}</div>
-        </div>`).join('');
+        const list = document.getElementById('email-list');
+        if (!emails.length) { renderEmpty('Inbox empty', "Send an email to your temporary address and it'll appear here."); return; }
+        list.innerHTML = emails.map((e, i) => `
+      <div class="email-item unread" onclick="openEmail(${i})">
+        <div class="email-from">${escHtml(e.from || 'Unknown Sender')}</div>
+        <div class="email-time">${formatTime(e.timestamp)}</div>
+        <div class="email-subject">${escHtml(e.subject || '(No Subject)')}</div>
+      </div>`).join('');
     }
 
-
     function openEmail(idx) {
-      const e = emails[idx];
-      currentEmailId = e.id;
-      document.getElementById('modal-subject').textContent = e.subject || '(No Subject)';
-      document.getElementById('modal-meta').textContent = `From: ${e.from || 'Unknown'}`;
-
-
-      const bodyText = extractBody(e.body || '');
-      document.getElementById('modal-body-text').textContent = bodyText;
-
-      document.getElementById('email-modal').style.display = 'flex';
-      document.body.style.overflow = 'hidden';
+        const e = emails[idx];
+        currentEmailId = e.id;
+        document.getElementById('modal-subject').textContent = e.subject || '(No Subject)';
+        document.getElementById('modal-meta').textContent = `From: ${e.from || 'Unknown'}`;
+        document.getElementById('modal-body-text').textContent = extractBody(e.body || '');
+        document.getElementById('email-modal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
 
     function closeModal(event) {
-      if (event && event.target !== document.getElementById('email-modal')) return;
-      document.getElementById('email-modal').style.display = 'none';
-      document.body.style.overflow = '';
+        if (event && event.target !== document.getElementById('email-modal')) return;
+        document.getElementById('email-modal').style.display = 'none';
+        document.body.style.overflow = '';
     }
-
 
     function openReport() {
-      document.getElementById('report-modal').style.display = 'flex';
-    }
-    function closeReportModal(event) {
-      if (event && event.target !== document.getElementById('report-modal')) return;
-      document.getElementById('report-modal').style.display = 'none';
-    }
-    async function submitReport() {
-      const reason = document.getElementById('report-reason').value.trim();
-      if (!reason) { showToast('Please provide a reason before submitting.', 'error'); return; }
-      try {
-        const res = await fetch(`${API_BASE}/report`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ emailId: currentEmailId, reason })
-        });
-        const data = await res.json();
-        if (data.success) {
-          showToast('Report submitted. Thank you.', 'success');
-          document.getElementById('report-reason').value = '';
-          document.getElementById('report-modal').style.display = 'none';
-        } else {
-          showToast(data.error || 'Could not submit report.', 'error');
-        }
-      } catch (e) {
-        showToast('Network error. Please try again.', 'error');
-      }
+        document.getElementById('report-modal').style.display = 'flex';
     }
 
+    function closeReportModal(event) {
+        if (event && event.target !== document.getElementById('report-modal')) return;
+        document.getElementById('report-modal').style.display = 'none';
+    }
+
+    async function submitReport() {
+        const reason = document.getElementById('report-reason').value.trim();
+        if (!reason) { showToast('Please provide a reason before submitting.', 'error'); return; }
+        try {
+            const res = await fetch(`${API_BASE}/report`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ emailId: currentEmailId, reason })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast('Report submitted. Thank you.', 'success');
+                document.getElementById('report-reason').value = '';
+                document.getElementById('report-modal').style.display = 'none';
+            } else {
+                showToast(data.error || 'Could not submit report.', 'error');
+            }
+        } catch (e) {
+            showToast('Network error. Please try again.', 'error');
+        }
+    }
 
     function copyAddress() {
-      if (!currentAddress) return;
-      navigator.clipboard.writeText(currentAddress).then(() => {
-        showToast('Copied to clipboard ✓', 'success');
-      }).catch(() => {
-        showToast('Could not copy — please copy manually.', 'error');
-      });
+        if (!currentAddress) return;
+        navigator.clipboard.writeText(currentAddress)
+            .then(() => showToast('Copied to clipboard', 'success'))
+            .catch(() => showToast('Could not copy, please copy manually.', 'error'));
     }
 
 
-    function escHtml(str) {
-      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    function extractBody(raw) {
+        if (!raw) return '';
+
+        const text = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+        const unfolded = text.replace(/\n([ \t]+)/g, ' ');
+
+        const ctMatch = unfolded.match(/^content-type:\s*([^;\n]+)/im);
+        const ct = ctMatch ? ctMatch[1].trim().toLowerCase() : '';
+
+        if (ct.startsWith('multipart/')) {
+            const bMatch = unfolded.match(/\bboundary=\s*"([^"]+)"/i)
+                || unfolded.match(/\bboundary=\s*([^\s;]+)/i);
+            if (bMatch) {
+                const boundary = bMatch[1].trim();
+                const result = parseMimeParts(text, boundary);
+                if (result) return result;
+            }
+        }
+
+        const headerEnd = text.indexOf('\n\n');
+        if (headerEnd === -1) return text.trim();
+
+        const headerBlock = text.slice(0, headerEnd);
+        const body = text.slice(headerEnd + 2);
+
+        return decodePartBody(body, headerBlock);
     }
 
-    function formatTime(ts) {
-      if (!ts) return '—';
-      const d = new Date(ts);
-      return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    function parseMimeParts(text, boundary) {
+        const delim = '--' + boundary;
+        const parts = text.split(delim);
+
+        let plainText = null;
+        let htmlText = null;
+
+        for (const part of parts) {
+            const trimmed = part.trim();
+            if (!trimmed || trimmed === '--') continue;
+
+
+            const unfolded = part.replace(/\n([ \t]+)/g, ' ');
+            const hdrEnd = unfolded.indexOf('\n\n');
+            if (hdrEnd === -1) continue;
+
+            const hdrBlock = unfolded.slice(0, hdrEnd);
+
+            const origHdrEnd = part.indexOf('\n\n');
+            const body = origHdrEnd !== -1 ? part.slice(origHdrEnd + 2) : '';
+
+            const ctMatch = hdrBlock.match(/content-type:\s*([^;\n]+)/i);
+            const partCt = ctMatch ? ctMatch[1].trim().toLowerCase() : 'text/plain';
+
+            if (partCt.startsWith('text/plain') && !plainText) {
+                plainText = decodePartBody(body, hdrBlock);
+            } else if (partCt.startsWith('text/html') && !htmlText) {
+                htmlText = stripHtml(decodePartBody(body, hdrBlock));
+            }
+        }
+
+        return plainText || htmlText || null;
     }
 
-      function extractBody(raw) {
-          if (!raw) return '';
+    function decodePartBody(body, headerBlock) {
+        const hdrs = (headerBlock || '').toLowerCase();
+        const encMatch = hdrs.match(/content-transfer-encoding:\s*(\S+)/);
+        const enc = encMatch ? encMatch[1].trim() : '';
 
-          const normalised = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        if (enc === 'base64') {
+            try {
+                const cleaned = body.replace(/\s+/g, '');
+                const binary = atob(cleaned);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                return new TextDecoder('utf-8').decode(bytes);
+            } catch (e) {
+                return body.trim();
+            }
+        }
 
-          const topCtMatch = normalised.match(/^content-type:\s*([^\n;]+)/im);
-          const topCt = topCtMatch ? topCtMatch[1].trim().toLowerCase() : '';
+        if (enc === 'quoted-printable') {
+            return body
+                .replace(/=\r?\n/g, '')
+                .replace(/=([0-9A-Fa-f]{2})/g, (_, h) => String.fromCharCode(parseInt(h, 16)));
+        }
 
-          if (topCt.startsWith('multipart/')) {
-              const boundaryMatch = normalised.match(/boundary="?([^"\n;]+)"?/i);
-              if (boundaryMatch) {
-                  const boundary = boundaryMatch[1].trim();
-                  const parts = splitMimeParts(normalised, boundary);
+        return body.trim();
+    }
 
-                  const plainPart = parts.find(p => p.ct.startsWith('text/plain'));
-                  if (plainPart) return decodePart(plainPart);
-
-                  const htmlPart = parts.find(p => p.ct.startsWith('text/html'));
-                  if (htmlPart) return stripHtml(decodePart(htmlPart));
-              }
-          }
-
-          const headerEnd = normalised.indexOf('\n\n');
-          if (headerEnd === -1) return normalised.trim();
-
-          const headers = normalised.slice(0, headerEnd).toLowerCase();
-          const bodyRaw = normalised.slice(headerEnd + 2);
-
-          const encoding = (headers.match(/content-transfer-encoding:\s*(\S+)/) || [])[1] || '';
-          const ct = (headers.match(/content-type:\s*([^;\n]+)/) || [])[1] || '';
-
-          let decoded = decodeContent(bodyRaw.trim(), encoding);
-          if (ct.trim().startsWith('text/html')) decoded = stripHtml(decoded);
-
-          return decoded.trim() || normalised.trim();
-      }
-
-      function splitMimeParts(raw, boundary) {
-          const delimiter = '--' + boundary;
-          const parts = [];
-          const segments = raw.split(delimiter);
-
-          for (const seg of segments) {
-              if (seg.trim() === '' || seg.trim() === '--') continue;
-              const hdrEnd = seg.indexOf('\n\n');
-              if (hdrEnd === -1) continue;
-              const hdrBlock = seg.slice(0, hdrEnd).toLowerCase();
-              const body = seg.slice(hdrEnd + 2);
-
-              const ctMatch = hdrBlock.match(/content-type:\s*([^;\n]+)/);
-              const encMatch = hdrBlock.match(/content-transfer-encoding:\s*(\S+)/);
-
-              parts.push({
-                  ct: (ctMatch ? ctMatch[1] : 'text/plain').trim(),
-                  encoding: (encMatch ? encMatch[1] : '').trim(),
-                  body
-              });
-          }
-          return parts;
-      }
-
-      function decodePart(part) {
-          return decodeContent(part.body.trim(), part.encoding);
-      }
-
-      function decodeContent(body, encoding) {
-          const enc = (encoding || '').toLowerCase().trim();
-          if (enc === 'base64') {
-              try {
-                  return decodeURIComponent(escape(atob(body.replace(/\s+/g, ''))));
-              } catch (e) {
-                  return body;
-              }
-          }
-          if (enc === 'quoted-printable') {
-              return body
-                  .replace(/=\r?\n/g, '')
-                  .replace(/=([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
-          }
-          return body;
-      }
-
-      function stripHtml(html) {
-          const tmp = document.createElement('div');
-          tmp.innerHTML = html;
-          tmp.querySelectorAll('br, p, div, tr').forEach(el => {
-              el.insertAdjacentText('beforebegin', '\n');
-          });
-          return (tmp.textContent || tmp.innerText || '').replace(/\n{3,}/g, '\n\n').trim();
-      }
-
-    function showToast(msg, type='success') {
-      const existing = document.querySelector('.toast');
-      if (existing) existing.remove();
-      const t = document.createElement('div');
-      t.className = `toast ${type}`;
-      t.textContent = msg;
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 3200);
+    function stripHtml(html) {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        div.querySelectorAll('br, p, div, tr, li').forEach(el => {
+            el.insertAdjacentText('afterend', '\n');
+        });
+        return (div.textContent || div.innerText || '')
+            .replace(/\n{3,}/g, '\n\n')
+            .trim();
     }
 
  
+
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function formatTime(ts) {
+        if (!ts) return '—';
+        return new Date(ts).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function showToast(msg, type = 'success') {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3200);
+    }
+
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        document.getElementById('email-modal').style.display = 'none';
-        document.getElementById('report-modal').style.display = 'none';
-        document.body.style.overflow = '';
-      }
+        if (e.key === 'Escape') {
+            document.getElementById('email-modal').style.display = 'none';
+            document.getElementById('report-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
     });
 
-
     generateNewAddress();
-  </script>
-
-</body>
-</html>
+</script>
