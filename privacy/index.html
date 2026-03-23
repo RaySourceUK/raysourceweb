@@ -15,39 +15,63 @@ Secure your privacy with disposable emails and self-destructing tools that leave
 </head>
 <body class="font-sans antialiased bg-primary-800 text-white">
 
-  <!-- Navbar -->
-  <nav class="sticky top-0 z-50 bg-secondary shadow-lg" id="navbar">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
-        <a href="/" class="flex items-center gap-3">
-          <img src="/assets/logo.png" alt="RaySource" width="40" height="40" class="w-10 h-10 object-contain" />
-          <span class="font-bold text-lg text-white tracking-wide">RaySource</span>
-        </a>
-        <div class="hidden md:flex items-center gap-8">
-          <a href="/#" class="text-primary-100 hover:text-white transition-colors text-sm font-medium">About Us</a>
-          <a href="#_" class="text-primary-100 hover:text-white transition-colors text-sm font-medium">Contact Us</a>
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 bg-secondary shadow-lg" id="navbar">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+
+          <!-- Brand -->
+          <a href="/" class="flex items-center gap-3">
+            <img
+              src="/assets/logo.png"
+              alt="RaySource"
+              width="40" height="40"
+              class="w-10 h-10 object-contain"
+            />
+            <span class="font-bold text-lg text-white tracking-wide">RaySource</span>
+          </a>
+
+          <!-- Desktop nav links -->
+          <div class="hidden md:flex items-center gap-8">
+            <a href="/#" class="text-primary-100 hover:text-white transition-colors text-sm font-medium">About Us</a>
+            <a href="#_" class="text-primary-100 hover:text-white transition-colors text-sm font-medium">Contact Us</a>
+          </div>
+
+          <!-- CTA + mobile toggle -->
+          <div class="flex items-center gap-3">
+            <a
+              href="/tools"
+              class="hidden md:inline-flex items-center px-4 py-2 bg-primary-800 text-white text-sm font-semibold rounded-md hover:bg-primary-900 transition-colors"
+            >Privacy Tools</a>
+
+            <!-- Hamburger -->
+            <button
+              id="nav-toggle"
+              class="md:hidden flex flex-col gap-1 p-2"
+              aria-label="Toggle navigation"
+            >
+              <span class="block w-6 h-0.5 bg-primary-100 rounded-full"></span>
+              <span class="block w-6 h-0.5 bg-primary-100 rounded-full"></span>
+              <span class="block w-6 h-0.5 bg-primary-100 rounded-full"></span>
+            </button>
+          </div>
         </div>
-        <div class="flex items-center gap-3">
-          <a href="/tools" class="hidden md:inline-flex items-center px-4 py-2 bg-primary-800 text-white text-sm font-semibold rounded-md hover:bg-primary-900 transition-colors">Privacy Tools</a>
-          <button id="nav-toggle" class="md:hidden flex flex-col gap-1 p-2" aria-label="Toggle navigation">
-            <span class="block w-6 h-0.5 bg-primary-100 rounded-full"></span>
-            <span class="block w-6 h-0.5 bg-primary-100 rounded-full"></span>
-            <span class="block w-6 h-0.5 bg-primary-100 rounded-full"></span>
-          </button>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden pb-4 flex-col gap-3">
+          <a href="/#" class="text-primary-100 hover:text-white text-sm font-medium py-2">About Us</a>
+          <a href="#_" class="text-primary-100 hover:text-white text-sm font-medium py-2">Contact Us</a>
+          <a href="/tools" class="inline-flex items-center px-4 py-2 bg-primary-800 text-white text-sm font-semibold rounded-md w-fit">Privacy Tools</a>
         </div>
       </div>
-      <div id="mobile-menu" class="hidden md:hidden pb-4 flex-col gap-3">
-        <a href="/#" class="text-primary-100 hover:text-white text-sm font-medium py-2">About Us</a>
-        <a href="#_" class="text-primary-100 hover:text-white text-sm font-medium py-2">Contact Us</a>
-        <a href="/tools" class="inline-flex items-center px-4 py-2 bg-primary-800 text-white text-sm font-semibold rounded-md w-fit">Privacy Tools</a>
-      </div>
-    </div>
-  </nav>
+    </nav>
 
   <!-- Content -->
   <p>&emsp;</p>
   <p>&emsp;</p>
   <p>&emsp;</p>
+  
+  <div class= "content-container">
   <section class="py-16 bg-secondary-600">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -79,7 +103,7 @@ Secure your privacy with disposable emails and self-destructing tools that leave
 
         <!-- Section 1 -->
         <div>
-          <h2 class="text-xl font-bold text-white mb-3">1. Who We Are</h2>
+          <h3 class="text-xl font-bold text-white mb-3">1. Who We Are</h3>
           <p>RaySource is operated by RaySource UK. Our Services are provided via the website <strong class="text-white">raysource.co.uk</strong>. If you have any questions about this policy or our data practices, you can contact us at <a href="mailto:support@raysource.co.uk" class="text-primary-100 underline hover:text-white">support@raysource.co.uk</a>.</p>
         </div>
 
@@ -87,7 +111,7 @@ Secure your privacy with disposable emails and self-destructing tools that leave
         
         <!-- Section 2 -->
         <div>
-          <h2 class="text-xl font-bold text-white mb-3">2. Our Privacy Philosophy</h2>
+          <h3 class="text-xl font-bold text-white mb-3">2. Our Privacy Philosophy</h3>
           <p>Our Services are designed from the ground up with privacy in mind. We do not require you to create an account, provide your name, or supply a real email address. We collect as little information as is necessary to operate our Services, and we do not sell, rent, or trade any data to third parties.</p>
         </div>
         
@@ -95,9 +119,9 @@ Secure your privacy with disposable emails and self-destructing tools that leave
 
         <!-- Section 3 -->
         <div>
-          <h2 class="text-xl font-bold text-white mb-4">3. Information We Collect</h2>
+          <h3 class="text-xl font-bold text-white mb-4">3. Information We Collect</h3>
 
-          <h3 class="text-base font-semibold text-white mb-2">3.1 IP Addresses</h3>
+          <h2 class="text-base font-semibold text-white mb-2">3.1 IP Addresses</h2>
           <p class="mb-3">When you use our Services, your IP address is automatically processed by our infrastructure and deleted after 1 hour (60 minutes). We collect and store your IP address for the following purposes:</p>
           <ul class="space-y-2 list-disc list-inside mb-3">
             <li><strong class="text-white">- Rate limiting:</strong> To prevent abuse of our Services by limiting the number of requests any single user can make within a given time window.</li>
@@ -107,7 +131,7 @@ Secure your privacy with disposable emails and self-destructing tools that leave
           </ul>
           <p>Rate-limiting records are stored for a maximum of 60 seconds. Ban records expire after 24 hours unless a longer restriction is applied manually following a serious or repeated violation.</p>
 
-          <h3 class="text-base font-semibold text-white mb-2 mt-6">3.2 BurnerMail: Email Data</h3>
+          <h2 class="text-base font-semibold text-white mb-2 mt-6">3.2 BurnerMail: Email Data</h2>
           <p class="mb-3">When an email is received by your temporary address, we store the following information temporarily in order to display it to you:</p>
           <ul class="space-y-1 list-disc list-inside mb-3">
             <li>- The sender's email address</li>
@@ -117,7 +141,7 @@ Secure your privacy with disposable emails and self-destructing tools that leave
           </ul>
           <p>All email data is automatically and permanently deleted after 1 hour (60 minutes) from the time of receipt. We do not read, analyse, or share the contents of emails for any purpose other than displaying them to you.</p>
 
-          <h3 class="text-base font-semibold text-white mb-2 mt-6">3.3 BurnerMail: Filtering &amp; Blacklisting</h3>
+          <h2 class="text-base font-semibold text-white mb-2 mt-6">3.3 BurnerMail: Filtering &amp; Blacklisting</h2>
           <p class="mb-3">To protect our Services and Users, we maintain the following restricted lists:</p>
           <ul class="space-y-2 list-disc list-inside mb-3">
             <li><strong class="text-white">- Restricted Senders:</strong> We maintain a list of known malicious sender addresses. Emails from these addresses are rejected immediately and never stored in our systems.</li>
@@ -125,10 +149,10 @@ Secure your privacy with disposable emails and self-destructing tools that leave
           </ul>
           <p>If a User attempts to receive an email from a source on the Banned Senders list, this transaction is flagged. Upon the User's attempt to access the inbox for that specific address, a permanent IP ban is issued to protect our infrastructure and ensure compliance with our BurnerMail Guidelines.</p>
 
-          <h3 class="text-base font-semibold text-white mb-2 mt-6">3.4 Abuse Reports</h3>
+          <h2 class="text-base font-semibold text-white mb-2 mt-6">3.4 Abuse Reports</h2>
           <p>If you submit a report of abusive content via our reporting feature, we store the email identifier, the reason you provided, and your IP address. This information is retained solely for the purpose of reviewing the reported content and taking appropriate action. All reports are deleted after 48 hours.</p>
 
-          <h3 class="text-base font-semibold text-white mb-2 mt-6">3.5 What We Do Not Collect</h3>
+          <h2 class="text-base font-semibold text-white mb-2 mt-6">3.5 What We Do Not Collect</h2>
           <ul class="space-y-1 list-disc list-inside">
             <li>- We do not collect your name, real email address, or any account credentials.</li>
             <li>- We do not use cookies for tracking or advertising purposes.</li>
@@ -141,7 +165,7 @@ Secure your privacy with disposable emails and self-destructing tools that leave
         
         <!-- Section 4 -->
         <div>
-          <h2 class="text-xl font-bold text-white mb-3">4. Legal Basis for Processing</h2>
+          <h3 class="text-xl font-bold text-white mb-3">4. Legal Basis for Processing</h3>
           <p>For users in the United Kingdom and European Economic Area, our legal basis for processing your IP address is our legitimate interest in protecting the integrity and security of our Services, and in preventing abuse. This processing is proportionate to the risks involved and does not override your rights and freedoms.</p>
         </div>
         
@@ -149,7 +173,7 @@ Secure your privacy with disposable emails and self-destructing tools that leave
 
         <!-- Section 5 -->
         <div>
-          <h2 class="text-xl font-bold text-white mb-3">5. Data Retention</h2>
+          <h3 class="text-xl font-bold text-white mb-3">5. Data Retention</h3>
           <p class="mb-3">The following retention periods apply to data we process:</p>
           <ul class="space-y-2 list-disc list-inside">
             <li><strong class="text-white">- Rate-limiting records:</strong> Deleted automatically after 60 seconds.</li>
@@ -165,12 +189,12 @@ Secure your privacy with disposable emails and self-destructing tools that leave
 
         <!-- Section 6 -->
         <div>
-          <h2 class="text-xl font-bold text-white mb-3">6. Data Sharing &amp; Third Parties</h2>
+          <h3 class="text-xl font-bold text-white mb-3">6. Data Sharing &amp; Third Parties</h3>
           <p class="mb-3">We do not sell, rent, or share your personal data with any third parties, except in the following limited circumstance:</p>
           <ul class="list-disc list-inside mb-4">
             <li><strong class="text-white">- Legal obligations:</strong> We may disclose information if required to do so by law, regulation, or court order, or to protect the rights, property, or safety of RaySource UK, our users, or others.</li>
           </ul>
-          <h3 class="text-base font-semibold text-white mb-2">6.1 Infrastructure Providers</h3>
+          <h2 class="text-base font-semibold text-white mb-2">6.1 Infrastructure Providers</h2>
           <p>Our Services are hosted on Cloudflare infrastructure. Data processed through our Services passes through Cloudflare's global network to ensure security and speed. Cloudflare operates under its own Privacy Policy, and use of their services is strictly for the technical delivery and protection of RaySource.</p>
         </div>
         
@@ -178,7 +202,7 @@ Secure your privacy with disposable emails and self-destructing tools that leave
 
         <!-- Section 7 -->
         <div>
-          <h2 class="text-xl font-bold text-white mb-3">7. Your Rights</h2>
+          <h3 class="text-xl font-bold text-white mb-3">7. Your Rights</h3>
           <p class="mb-3">If you are located in the United Kingdom or the European Economic Area, you have the following rights in relation to the personal data we hold about you:</p>
           <ul class="space-y-2 list-disc list-inside mb-4">
             <li><strong class="text-white">- Right of access:</strong> You have the right to request a copy of the personal data we hold about you.</li>
@@ -194,7 +218,7 @@ Secure your privacy with disposable emails and self-destructing tools that leave
 
         <!-- Section 8 -->
         <div>
-          <h2 class="text-xl font-bold text-white mb-3">8. Security</h2>
+          <h3 class="text-xl font-bold text-white mb-3">8. Security</h3>
           <p>We take appropriate technical and organisational measures to protect your data against unauthorised access, disclosure, alteration, or destruction. Our Services are delivered over HTTPS, and data is stored using Cloudflare's Key-Value infrastructure with strict access controls.</p>
         </div>
         
@@ -202,7 +226,7 @@ Secure your privacy with disposable emails and self-destructing tools that leave
 
         <!-- Section 9 -->
         <div>
-          <h2 class="text-xl font-bold text-white mb-3">9. Children's Privacy</h2>
+          <h3 class="text-xl font-bold text-white mb-3">9. Children's Privacy</h3>
           <p>Our Services are not directed at children under the age of 13. We do not knowingly collect personal data from children under 13. If you believe we have inadvertently collected such information, please contact us at <a href="mailto:support@raysource.co.uk" class="text-primary-100 underline hover:text-white">support@raysource.co.uk</a> and we will take steps to delete it.</p>
         </div>
         
@@ -210,7 +234,7 @@ Secure your privacy with disposable emails and self-destructing tools that leave
 
         <!-- Section 10 -->
         <div>
-          <h2 class="text-xl font-bold text-white mb-3">10. Changes to This Policy</h2>
+          <h3 class="text-xl font-bold text-white mb-3">10. Changes to This Policy</h3>
           <p>We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated "Last updated" date. We encourage you to review this policy periodically. Continued use of our Services after any changes constitutes your acceptance of the updated policy.</p>
         </div>
         
@@ -218,13 +242,14 @@ Secure your privacy with disposable emails and self-destructing tools that leave
 
         <!-- Section 11 -->
         <div>
-          <h2 class="text-xl font-bold text-white mb-3">11. Contact</h2>
+          <h3 class="text-xl font-bold text-white mb-3">11. Contact</h3>
           <p class="mb-2">If you have any questions, concerns, or requests relating to this Privacy Policy or the way we handle your data, please contact us at:</p> <a href="mailto:support@raysource.co.uk" class="text-primary-100 underline hover:text-white">support@raysource.co.uk</a>
         </div>
 
       </div>
     </div>
   </section>
+</div>
   
   <p>&emsp;</p>
 
